@@ -6,13 +6,13 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-public class ClienteTCP implements Runnable {
+public class Cliente_TCP implements Runnable {
 
     private Socket scCliente;
-    private ServerTCP server;
+    private Server_TCP server;
     private PrintWriter out;
 
-    public ClienteTCP(Socket scCliente, ServerTCP server){
+    public Cliente_TCP(Socket scCliente, Server_TCP server){
         this.scCliente = scCliente;
         this.server = server;
 
@@ -25,6 +25,7 @@ public class ClienteTCP implements Runnable {
     public void mandarMensaje(String mensaje){
         out.println(mensaje);
     }
+
     @Override
     public void run() {
 
