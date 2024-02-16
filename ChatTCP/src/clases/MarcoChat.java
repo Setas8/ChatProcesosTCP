@@ -14,16 +14,14 @@ import java.util.Set;
 
 public class MarcoChat extends JFrame {
     static Set<String> nombresUsuarios = new HashSet<>();
-
     public static void main(String[] args) {
 
         String nombreUser = "";
-        //Si el nombre está en el conjunto, se repite el JOptionPane
-        do {
+
             nombreUser = JOptionPane.showInputDialog("Escribe tu nick");
             MarcoChat chat = new MarcoChat(nombreUser);
             chat.lanzarChat();
-        } while (!addUsuarios(nombreUser));
+
     }
 
     private JPanel mainPanel;
@@ -34,7 +32,6 @@ public class MarcoChat extends JFrame {
     private JLabel lblUsers;
     private JTextArea taUsers;
     private JTextArea taTextoChat;
-    private boolean desconectar = false;
     private String nombreUser;
     private Socket sc;
     private PrintWriter out;
@@ -42,15 +39,7 @@ public class MarcoChat extends JFrame {
     private final int PUERTO_SERVIDOR = 6001;
     private final String HOST = "localhost";
 
-    public JTextArea getTaTextoChat() {
-        return taTextoChat;
-    }
-
-    public void setTaTextoChat(JTextArea taTextoChat) {
-        this.taTextoChat = taTextoChat;
-    }
-
-    public void lanzarChat() {
+    public void lanzarChat(){
         this.setContentPane(mainPanel);
         this.setVisible(true);
         this.setTitle("CHAT DE  " + nombreUser.toUpperCase());
@@ -58,7 +47,6 @@ public class MarcoChat extends JFrame {
         mandarUsuariosConectados();
 
     }
-
     public MarcoChat(String nombreUsuario) {
 
         this.nombreUser = nombreUsuario;
@@ -86,7 +74,7 @@ public class MarcoChat extends JFrame {
 
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        //Enviar mensajes al panel del chat   ///MAndarlo por TCP/UDP
+        //Enviar mensajes al panel del chat   ///MAndarlo por TCP
         btnEnviar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -94,7 +82,7 @@ public class MarcoChat extends JFrame {
                 String user = nombreUsuario + "$-> ";
 
                 String mensaje = user + tfChat.getText() + "\n";
-                //Mandar el mensaje al otro
+                //Mandar el mensaje a los otros
                 out.println(mensaje);
 
                 //Limpiar el área de texto
@@ -126,14 +114,31 @@ public class MarcoChat extends JFrame {
             out = new PrintWriter(sc.getOutputStream(), true);
             out.println(nombreUser);
 
-            ClienteHilo ch = new ClienteHilo(this, sc);
+            ClienteHilo ch = new ClienteHilo();
             Thread hiloCli = new Thread(ch);
             hiloCli.start();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    private class ClienteHilo implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                BufferedReader in = new BufferedReader(new InputStreamReader(sc.getInputStream()));
+                String texto = "";
+                while ((texto = in.readLine()) != null){
+                    taTextoChat.append(texto + "\n");
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
     private String darNombreChat(String nombre) {
 
@@ -147,9 +152,8 @@ public class MarcoChat extends JFrame {
         this.taUsers.append(nombreUser);
 
     }
-
-    //Añadir usuarios
-    private static boolean addUsuarios(String nombre) {
+    //Comprobar si ya están!!!!!!!Falta
+    private  static boolean addUsuarios(String nombre) {
 
         boolean insertado = false;
         if (nombresUsuarios.add(nombre))
@@ -157,4 +161,5 @@ public class MarcoChat extends JFrame {
 
         return insertado;
     }
+
 }
