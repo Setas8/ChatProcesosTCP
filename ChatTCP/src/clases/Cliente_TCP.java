@@ -36,7 +36,8 @@ public class Cliente_TCP implements Runnable {
             String texto;
             while ((texto = in.readLine()) != null){
 
-                server.emitirMensaje(nombreUser + "$-> "+ texto);
+                server.emitirMensaje(texto);
+                //server.emitirMensaje(nombreUser + "$-> "+ texto);
             }
 
         } catch (IOException e) {

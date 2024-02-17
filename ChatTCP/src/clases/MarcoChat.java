@@ -80,8 +80,8 @@ public class MarcoChat extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 String user = nombreUsuario + "$-> ";
-
                 String mensaje = user + tfChat.getText() + "\n";
+
                 //Mandar el mensaje a los otros
                 out.println(mensaje);
 
