@@ -29,6 +29,7 @@ public class Server_TCP {
                 Thread hiloCliente = new Thread (c);
                 hiloCliente.start();
 
+                emitirListaConectados();
             }
 
         } catch (IOException e) {
@@ -40,8 +41,20 @@ public class Server_TCP {
             c.mandarMensaje(mensaje);
         }
     }
+    public void emitirListaConectados() {
+        List<String> lista = new ArrayList<>();
+        for (Cliente_TCP c : listaClientes) {
+            lista.add(c.getNombre());
+        }
+
+        for (Cliente_TCP c : listaClientes) {
+            c.enviarClientesConectados(lista);
+        }
+    }
+
     public void eliminarClienteLista(Cliente_TCP cl) {
         listaClientes.remove(cl);
+        emitirListaConectados();
     }
 
 }

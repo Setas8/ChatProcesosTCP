@@ -5,12 +5,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.List;
 
 public class Cliente_TCP implements Runnable {
 
     private Socket scCliente;
     private Server_TCP server;
     private PrintWriter out;
+    private String nombre;
 
     public Cliente_TCP(Socket scCliente, Server_TCP server){
         this.scCliente = scCliente;
@@ -22,8 +24,19 @@ public class Cliente_TCP implements Runnable {
             e.printStackTrace();
         }
     }
+    public String getNombre() {
+        return nombre;
+    }
     public void mandarMensaje(String mensaje){
         out.println(mensaje);
+    }
+    public void enviarClientesConectados(List<String> listaClientes) {
+
+        String lista = "Usuarios conectados:\n";
+        for (String usuario : listaClientes) {
+            lista = lista + usuario + "\n";
+        }
+        mandarMensaje(lista);
     }
 
     @Override
@@ -35,9 +48,7 @@ public class Cliente_TCP implements Runnable {
 
             String texto;
             while ((texto = in.readLine()) != null){
-
                 server.emitirMensaje(texto);
-                //server.emitirMensaje(nombreUser + "$-> "+ texto);
             }
 
         } catch (IOException e) {

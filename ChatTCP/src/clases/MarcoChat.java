@@ -13,14 +13,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class MarcoChat extends JFrame {
-    static Set<String> nombresUsuarios = new HashSet<>();
+
     public static void main(String[] args) {
 
         String nombreUser = "";
 
-            nombreUser = JOptionPane.showInputDialog("Escribe tu nick");
-            MarcoChat chat = new MarcoChat(nombreUser);
-            chat.lanzarChat();
+        nombreUser = JOptionPane.showInputDialog("Escribe tu nick");
+        MarcoChat chat = new MarcoChat(nombreUser);
+        chat.lanzarChat();
 
     }
 
@@ -44,7 +44,7 @@ public class MarcoChat extends JFrame {
         this.setVisible(true);
         this.setTitle("CHAT DE  " + nombreUser.toUpperCase());
         conectarServidor();
-        mandarUsuariosConectados();
+        //mandarUsuariosConectados();
 
     }
     public MarcoChat(String nombreUsuario) {
@@ -83,10 +83,14 @@ public class MarcoChat extends JFrame {
                 String mensaje = user + tfChat.getText() + "\n";
 
                 //Mandar el mensaje a los otros
-                out.println(mensaje);
+                if (!mensaje.isEmpty()) {
+                    out.println(mensaje);
+                    //Limpiar el área de texto
+                    tfChat.setText("");
+                }
 
-                //Limpiar el área de texto
-                tfChat.setText("");
+
+
             }
         });
 
@@ -131,7 +135,11 @@ public class MarcoChat extends JFrame {
                 BufferedReader in = new BufferedReader(new InputStreamReader(sc.getInputStream()));
                 String texto = "";
                 while ((texto = in.readLine()) != null){
-                    taTextoChat.append(texto + "\n");
+                    if (texto.startsWith("Usuarios conectados:")) {
+                        taUsers.setText(texto);
+                    }
+                    else
+                        taTextoChat.append(texto + "\n");
                 }
 
             } catch (IOException e) {
@@ -152,14 +160,6 @@ public class MarcoChat extends JFrame {
         this.taUsers.append(nombreUser);
 
     }
-    //Comprobar si ya están!!!!!!!Falta
-    private  static boolean addUsuarios(String nombre) {
 
-        boolean insertado = false;
-        if (nombresUsuarios.add(nombre))
-            insertado = true;
-
-        return insertado;
-    }
 
 }
