@@ -9,8 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.HashSet;
-import java.util.Set;
+
 
 public class MarcoChat extends JFrame {
 
@@ -44,7 +43,7 @@ public class MarcoChat extends JFrame {
         this.setVisible(true);
         this.setTitle("CHAT DE  " + nombreUser.toUpperCase());
         conectarServidor();
-        //mandarUsuariosConectados();
+
 
     }
     public MarcoChat(String nombreUsuario) {
@@ -60,7 +59,7 @@ public class MarcoChat extends JFrame {
         int anchoPantalla = pantallaSize.width;
         int alturaPantalla = pantallaSize.height;
 
-        this.setSize(anchoPantalla / 2, alturaPantalla / 2);
+        this.setSize(anchoPantalla / 3, alturaPantalla / 2);
         this.setLocation(anchoPantalla / 4, alturaPantalla / 4);
 
         // Imagen
@@ -80,7 +79,7 @@ public class MarcoChat extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 String user = nombreUsuario + "$-> ";
-                String mensaje = user + tfChat.getText() + "\n";
+                String mensaje = user + tfChat.getText() + "\n"; //Probar sin salto de línea
 
                 //Mandar el mensaje a los otros
                 if (!mensaje.isEmpty()) {
@@ -136,7 +135,7 @@ public class MarcoChat extends JFrame {
                 String texto = "";
                 while ((texto = in.readLine()) != null){
                     if (texto.startsWith("Usuarios conectados:")) {
-                        taUsers.setText(texto);
+                        actualizarListaConectados(texto);
                     }
                     else
                         taTextoChat.append(texto + "\n");
@@ -155,10 +154,13 @@ public class MarcoChat extends JFrame {
         return this.lblChat.getText();
     }
 
-    private void mandarUsuariosConectados() {
-
-        this.taUsers.append(nombreUser);
-
+    private void actualizarListaConectados(String textoConectados) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                taUsers.setText(textoConectados);
+            }
+        });
     }
 
 

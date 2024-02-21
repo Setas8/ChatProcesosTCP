@@ -14,17 +14,19 @@ public class Server_TCP {
     }
 
     private final int PUERTO_SERVER = 6001;
-    private List<Cliente_TCP> listaClientes = new ArrayList<>();
+    private List<ManejadorClientes> listaClientes = new ArrayList<>();
 
+    String nombreCliente;
     public void lanzarServer(){
 
         try {
             ServerSocket scServer = new ServerSocket(PUERTO_SERVER);
+            System.out.println("Servidor en marcha por el puerto " + PUERTO_SERVER);
             while (true) {
                 Socket scCliente = scServer.accept();
                 System.out.println("Nuevo cliente conectado!");
 
-                Cliente_TCP c = new Cliente_TCP(scCliente, this);
+                ManejadorClientes c = new ManejadorClientes(scCliente, this);
                 listaClientes.add(c);
                 Thread hiloCliente = new Thread (c);
                 hiloCliente.start();
@@ -37,22 +39,25 @@ public class Server_TCP {
         }
     }
     public void emitirMensaje(String mensaje) {
-        for (Cliente_TCP c : listaClientes) {
+        for (ManejadorClientes c : listaClientes) {
             c.mandarMensaje(mensaje);
         }
     }
     public void emitirListaConectados() {
+
         List<String> lista = new ArrayList<>();
-        for (Cliente_TCP c : listaClientes) {
-            lista.add(c.getNombre());
+
+        for (ManejadorClientes c : listaClientes) {
+            lista.add(nombreCliente);
         }
 
-        for (Cliente_TCP c : listaClientes) {
-            c.enviarClientesConectados(lista);
+        String mensaje = "Usuarios conectados: " + String.join("\n", lista);
+        for (ManejadorClientes c : listaClientes) {
+            c.mandarMensaje(mensaje);
         }
     }
 
-    public void eliminarClienteLista(Cliente_TCP cl) {
+    public void eliminarClienteLista(ManejadorClientes cl) {
         listaClientes.remove(cl);
         emitirListaConectados();
     }
