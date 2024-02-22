@@ -12,11 +12,8 @@ public class Server_TCP {
         Server_TCP server = new Server_TCP();
         server.lanzarServer();
     }
-
     private final int PUERTO_SERVER = 6001;
     private List<ManejadorClientes> listaClientes = new ArrayList<>();
-
-
     public void lanzarServer(){
 
         try {
@@ -31,8 +28,6 @@ public class Server_TCP {
 
                 String nombre = flujo_entrada.readUTF();
 
-                //System.out.println("Prueba para ver si sale el nombre" + nombre);
-
                 ManejadorClientes c = new ManejadorClientes(scCliente, this);
                 c.setNombre(nombre);
                 listaClientes.add(c);
@@ -40,9 +35,7 @@ public class Server_TCP {
                 hiloCliente.start();
 
                 emitirListaConectados();
-                //flujo_entrada.close();
             }
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -59,16 +52,14 @@ public class Server_TCP {
         for (ManejadorClientes c : listaClientes) {
             lista.add(c.getNombre());
         }
-
+        //concatenar elementos de una lista (en este caso, lista) separados por un salto de línea
         String mensaje = "Usuarios conectados:\n " + String.join("\n", lista);
         for (ManejadorClientes c : listaClientes) {
             c.mandarMensaje(mensaje);
         }
     }
-
-    public void eliminarClienteLista(ManejadorClientes cl) {
-        listaClientes.remove(cl);
-        emitirListaConectados();
-    }
-
+//    public void eliminarClienteLista(ManejadorClientes cl) {
+//        listaClientes.remove(cl);
+//        emitirListaConectados();
+//    }
 }

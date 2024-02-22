@@ -7,9 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.Socket;
 
-
 public class MarcoChat extends JFrame {
-
     public static void main(String[] args) {
 
         String nombreUser = "";
@@ -30,7 +28,6 @@ public class MarcoChat extends JFrame {
     private JTextArea taTextoChat;
     private String nombreUser;
     private Socket sc;
-    private PrintWriter out;
 
     private final int PUERTO_SERVIDOR = 6001;
     private final String HOST = "localhost";
@@ -40,8 +37,6 @@ public class MarcoChat extends JFrame {
         this.setVisible(true);
         this.setTitle("CHAT DE  " + nombreUser.toUpperCase());
         conectarServidor();
-
-
     }
     public MarcoChat(String nombreUsuario) {
 
@@ -56,10 +51,11 @@ public class MarcoChat extends JFrame {
         int anchoPantalla = pantallaSize.width;
         int alturaPantalla = pantallaSize.height;
 
+        //Establecer las dimensiones del marco
         this.setSize(anchoPantalla / 3, alturaPantalla / 2);
         this.setLocation(anchoPantalla / 4, alturaPantalla / 4);
 
-        // Imagen
+        // Imagen (no la pilla)
         Image icono = pantalla.getImage("seta.gif"); // gif pesa menos
         this.setIconImage(icono);
 
@@ -70,31 +66,27 @@ public class MarcoChat extends JFrame {
 
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        //Enviar mensajes al panel del chat   ///MAndarlo por TCP
+        //Enviar mensajes al panel del chat
         btnEnviar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-
                 String user = nombreUsuario + "$-> ";
-                String mensaje = user + tfChat.getText(); //Probar sin salto de línea
+                String mensaje = user + tfChat.getText();
 
                 //Mandar el mensaje a los otros
                 if (!mensaje.isEmpty()) {
 
                     OutputStream outaux = null;
                     try {
-
                         outaux = sc.getOutputStream();
                         DataOutputStream flujo_salida= new DataOutputStream(outaux);
 
                         flujo_salida.writeUTF(mensaje);
-                        //flujo_salida.close();
                     } catch (IOException ex) {
                         System.out.println(ex);
                     }
 
-                    //out.println(mensaje);
                     //Limpiar el área de texto
                     tfChat.setText("");
                 }
@@ -102,24 +94,28 @@ public class MarcoChat extends JFrame {
         });
 
         //Desconectar usuario
-        btnDesconect.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                //Cerrar dataOutput
-
-                out.close();
-                try {
-                    sc.close();
-                } catch (IOException ioe) {
-                    throw new RuntimeException(ioe);
-                }
-                System.exit(0);
-            }
-        });
+//        btnDesconect.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//
+//                String mensaje = nombreUser + " abandonó el chat";
+//
+//                OutputStream outaux = null;
+//                try {
+//
+//                    outaux = sc.getOutputStream();
+//                    DataOutputStream flujo_salida= new DataOutputStream(outaux);
+//
+//                    flujo_salida.writeUTF(mensaje);
+//
+//                } catch (IOException ex) {
+//                    System.out.println(ex);
+//                }
+//
+//            }
+//        });
 
     }
-
     private void conectarServidor() {
 
         try {
@@ -129,14 +125,10 @@ public class MarcoChat extends JFrame {
             DataOutputStream flujo_salida= new DataOutputStream(outaux);
 
             flujo_salida.writeUTF(nombreUser);
-//            out = new PrintWriter(sc.getOutputStream(), true);
-//            out.println(nombreUser);
 
-            //flujo_salida.close();
             ClienteHilo ch = new ClienteHilo();
             Thread hiloCli = new Thread(ch);
             hiloCli.start();
-
 
         } catch (IOException e) {
             System.out.println(e);
@@ -147,7 +139,6 @@ public class MarcoChat extends JFrame {
 
         @Override
         public void run() {
-
 
             while(true) {
 
@@ -164,31 +155,11 @@ public class MarcoChat extends JFrame {
                     } else
                         taTextoChat.append(texto + "\n");
 
-
-                    //flujo_entrada.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
 
             }
-
-
-
-//            try {
-//                BufferedReader in = new BufferedReader(new InputStreamReader(sc.getInputStream()));
-//                String texto = "";
-//                while ((texto = in.readLine()) != null){
-//                    if (texto.startsWith("Usuarios conectados:")) {
-//                        actualizarListaConectados(texto);
-//                        //taUsers.setText(texto);
-//                    }
-//                    else
-//                        taTextoChat.append(texto + "\n");
-//                }
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
 
         }
     }
@@ -198,15 +169,5 @@ public class MarcoChat extends JFrame {
 
         return this.lblChat.getText();
     }
-
-    private  void actualizarListaConectados(String textoConectados) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                taUsers.setText(textoConectados);
-            }
-        });
-    }
-
 
 }
