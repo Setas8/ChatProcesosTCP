@@ -1,6 +1,6 @@
 package clases;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class Server_TCP {
     private final int PUERTO_SERVER = 6001;
     private List<ManejadorClientes> listaClientes = new ArrayList<>();
 
-    String nombreCliente;
+
     public void lanzarServer(){
 
         try {
@@ -26,7 +26,9 @@ public class Server_TCP {
                 Socket scCliente = scServer.accept();
                 System.out.println("Nuevo cliente conectado!");
 
+               String nombre = scCliente.getOutputStream().toString();
                 ManejadorClientes c = new ManejadorClientes(scCliente, this);
+                c.setNombre(nombre);
                 listaClientes.add(c);
                 Thread hiloCliente = new Thread (c);
                 hiloCliente.start();
@@ -48,7 +50,7 @@ public class Server_TCP {
         List<String> lista = new ArrayList<>();
 
         for (ManejadorClientes c : listaClientes) {
-            lista.add(nombreCliente);
+            lista.add(c.getNombre());
         }
 
         String mensaje = "Usuarios conectados: " + String.join("\n", lista);

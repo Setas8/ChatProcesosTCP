@@ -26,6 +26,11 @@ public class ManejadorClientes implements Runnable {
     public String getNombre() {
         return nombre;
     }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
     public void mandarMensaje(String mensaje){
         out.println(mensaje);
     }

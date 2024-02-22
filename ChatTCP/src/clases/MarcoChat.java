@@ -4,10 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 
@@ -79,7 +76,7 @@ public class MarcoChat extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 String user = nombreUsuario + "$-> ";
-                String mensaje = user + tfChat.getText() + "\n"; //Probar sin salto de línea
+                String mensaje = user + tfChat.getText(); //Probar sin salto de línea
 
                 //Mandar el mensaje a los otros
                 if (!mensaje.isEmpty()) {
@@ -114,12 +111,15 @@ public class MarcoChat extends JFrame {
         try {
             sc = new Socket(HOST, PUERTO_SERVIDOR);
 
+
             out = new PrintWriter(sc.getOutputStream(), true);
             out.println(nombreUser);
+
 
             ClienteHilo ch = new ClienteHilo();
             Thread hiloCli = new Thread(ch);
             hiloCli.start();
+
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -136,6 +136,7 @@ public class MarcoChat extends JFrame {
                 while ((texto = in.readLine()) != null){
                     if (texto.startsWith("Usuarios conectados:")) {
                         actualizarListaConectados(texto);
+                        //taUsers.setText(texto);
                     }
                     else
                         taTextoChat.append(texto + "\n");
@@ -154,7 +155,7 @@ public class MarcoChat extends JFrame {
         return this.lblChat.getText();
     }
 
-    private void actualizarListaConectados(String textoConectados) {
+    private  void actualizarListaConectados(String textoConectados) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
