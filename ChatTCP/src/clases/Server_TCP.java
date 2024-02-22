@@ -26,7 +26,13 @@ public class Server_TCP {
                 Socket scCliente = scServer.accept();
                 System.out.println("Nuevo cliente conectado!");
 
-               String nombre = scCliente.getOutputStream().toString();
+                InputStream inaux = scCliente.getInputStream();
+                DataInputStream flujo_entrada = new	 DataInputStream(inaux);
+
+                String nombre = flujo_entrada.readUTF();
+
+                //System.out.println("Prueba para ver si sale el nombre" + nombre);
+
                 ManejadorClientes c = new ManejadorClientes(scCliente, this);
                 c.setNombre(nombre);
                 listaClientes.add(c);
@@ -34,6 +40,7 @@ public class Server_TCP {
                 hiloCliente.start();
 
                 emitirListaConectados();
+                //flujo_entrada.close();
             }
 
         } catch (IOException e) {
@@ -53,7 +60,7 @@ public class Server_TCP {
             lista.add(c.getNombre());
         }
 
-        String mensaje = "Usuarios conectados: " + String.join("\n", lista);
+        String mensaje = "Usuarios conectados:\n " + String.join("\n", lista);
         for (ManejadorClientes c : listaClientes) {
             c.mandarMensaje(mensaje);
         }

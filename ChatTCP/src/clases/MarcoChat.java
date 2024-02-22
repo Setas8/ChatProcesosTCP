@@ -75,18 +75,29 @@ public class MarcoChat extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+
                 String user = nombreUsuario + "$-> ";
                 String mensaje = user + tfChat.getText(); //Probar sin salto de línea
 
                 //Mandar el mensaje a los otros
                 if (!mensaje.isEmpty()) {
-                    out.println(mensaje);
+
+                    OutputStream outaux = null;
+                    try {
+
+                        outaux = sc.getOutputStream();
+                        DataOutputStream flujo_salida= new DataOutputStream(outaux);
+
+                        flujo_salida.writeUTF(mensaje);
+                        //flujo_salida.close();
+                    } catch (IOException ex) {
+                        System.out.println(ex);
+                    }
+
+                    //out.println(mensaje);
                     //Limpiar el área de texto
                     tfChat.setText("");
                 }
-
-
-
             }
         });
 
@@ -94,6 +105,9 @@ public class MarcoChat extends JFrame {
         btnDesconect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                //Cerrar dataOutput
+
                 out.close();
                 try {
                     sc.close();
@@ -111,18 +125,21 @@ public class MarcoChat extends JFrame {
         try {
             sc = new Socket(HOST, PUERTO_SERVIDOR);
 
+            OutputStream outaux = sc.getOutputStream();
+            DataOutputStream flujo_salida= new DataOutputStream(outaux);
 
-            out = new PrintWriter(sc.getOutputStream(), true);
-            out.println(nombreUser);
+            flujo_salida.writeUTF(nombreUser);
+//            out = new PrintWriter(sc.getOutputStream(), true);
+//            out.println(nombreUser);
 
-
+            //flujo_salida.close();
             ClienteHilo ch = new ClienteHilo();
             Thread hiloCli = new Thread(ch);
             hiloCli.start();
 
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println(e);
         }
     }
 
@@ -130,21 +147,48 @@ public class MarcoChat extends JFrame {
 
         @Override
         public void run() {
-            try {
-                BufferedReader in = new BufferedReader(new InputStreamReader(sc.getInputStream()));
-                String texto = "";
-                while ((texto = in.readLine()) != null){
+
+
+            while(true) {
+
+                InputStream inaux = null;
+                try {
+                    inaux = sc.getInputStream();
+                    DataInputStream flujo_entrada = new DataInputStream(inaux);
+
+                    String texto = flujo_entrada.readUTF();
+
                     if (texto.startsWith("Usuarios conectados:")) {
-                        actualizarListaConectados(texto);
-                        //taUsers.setText(texto);
-                    }
-                    else
+                        //actualizarListaConectados(texto);
+                        taUsers.setText(texto);
+                    } else
                         taTextoChat.append(texto + "\n");
+
+
+                    //flujo_entrada.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
 
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+
+
+
+//            try {
+//                BufferedReader in = new BufferedReader(new InputStreamReader(sc.getInputStream()));
+//                String texto = "";
+//                while ((texto = in.readLine()) != null){
+//                    if (texto.startsWith("Usuarios conectados:")) {
+//                        actualizarListaConectados(texto);
+//                        //taUsers.setText(texto);
+//                    }
+//                    else
+//                        taTextoChat.append(texto + "\n");
+//                }
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 
         }
     }
